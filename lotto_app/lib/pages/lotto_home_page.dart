@@ -31,14 +31,13 @@ class _LottoHomePageState extends State<LottoHomePage> {
   int? _travelingNumber;
   Completer<void>? _arrivalCompleter;
 
-  static const double _sphereSize = 220;
+  static const double _sphereSize = 260;
   static const double _headerHeight = 80;
   static const double _machineAreaTop = _headerHeight;
   static const double _sphereScreenTop = _machineAreaTop + 50;
   static const double _sphereRadius = _sphereSize / 2;
   static const double _sphereCenterY = _sphereScreenTop + _sphereRadius;
   static const double _tubeTopY = _machineAreaTop + 2;
-  static const double _pathGap = 12;
 
   Path _buildUpwardPath(double screenWidth) {
     final cx = screenWidth / 2;
@@ -176,9 +175,9 @@ class _LottoHomePageState extends State<LottoHomePage> {
                 controller: _scrollController,
                 child: Column(
                   children: [
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 2),
                     const Text(
-                      '🎱 로또 번호 추첨기',
+                      '🎱 6/45 로또 번호 추첨기',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 24,
@@ -194,7 +193,7 @@ class _LottoHomePageState extends State<LottoHomePage> {
                         fontSize: 13,
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 8),
                     Center(
                       child: LottoMachine(
                         key: _machineKey,
@@ -202,58 +201,60 @@ class _LottoHomePageState extends State<LottoHomePage> {
                         sphereSize: _sphereSize,
                       ),
                     ),
-                    const SizedBox(height: _pathGap),
-                    const SizedBox(height: _pathGap),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(right: 4, bottom: 6),
-                            child: _ResetButton(onPressed: _reset),
-                          ),
-                          ResultPanel(
-                            result: _currentResult,
-                            revealedNumbers: _revealedNumbers,
-                            showPlus: _showPlus,
-                            showBonus: _showBonus,
-                          ),
-                        ],
+                    Transform.translate(
+                      offset: const Offset(0, -12),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(right: 4, bottom: 2),
+                              child: _ResetButton(onPressed: _reset),
+                            ),
+                            ResultPanel(
+                              result: _currentResult,
+                              revealedNumbers: _revealedNumbers,
+                              showPlus: _showPlus,
+                              showBonus: _showBonus,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 4),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: _DrawButton(
-                                  onPressed: _isDrawing ? null : _startDraw,
-                                  isDrawing: _isDrawing,
-                                ),
+                      child: IntrinsicHeight(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            _DrawButton(
+                              onPressed: _isDrawing ? null : _startDraw,
+                              isDrawing: _isDrawing,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  _AiButton(
+                                    onPressed: _isDrawing
+                                        ? null
+                                        : () {
+                                            Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                  builder: (_) =>
+                                                      const AiPage()),
+                                            );
+                                          },
+                                  ),
+                                  const SizedBox(height: 8),
+                                  const _BuyButton(),
+                                ],
                               ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: _AiButton(
-                                  onPressed: _isDrawing
-                                      ? null
-                                      : () {
-                                          Navigator.of(context).push(
-                                            MaterialPageRoute(
-                                                builder: (_) =>
-                                                    const AiPage()),
-                                          );
-                                        },
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          const _BuyButton(),
-                        ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -312,7 +313,7 @@ class _ActionButton extends StatelessWidget {
         boxShadow: shadowColor != null
             ? [
                 BoxShadow(
-                  color: shadowColor!.withValues(alpha: 0.4),
+                  color: shadowColor!.withValues(alpha: 0.3),
                   blurRadius: 10,
                   offset: const Offset(0, 3),
                 ),
@@ -358,12 +359,51 @@ class _DrawButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _ActionButton(
-      onPressed: onPressed,
-      label: isDrawing ? '추첨 중...' : '추첨 시작',
-      icon: Icons.casino,
-      gradientColors: const [Color(0xFFE94560), Color(0xFFFF6B81)],
-      shadowColor: const Color(0xFFE94560),
+    final enabled = onPressed != null;
+
+    return Container(
+      width: 88,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF7C3AED), Color(0xFF9F7AEA)],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF7C3AED).withValues(alpha: 0.35),
+            blurRadius: 12,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: onPressed,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                isDrawing ? Icons.hourglass_top : Icons.casino,
+                color: Colors.white.withValues(alpha: enabled ? 1 : 0.5),
+                size: 28,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                isDrawing ? '추첨 중' : '추첨 시작',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: enabled ? 1 : 0.5),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -410,8 +450,8 @@ class _AiButton extends StatelessWidget {
       onPressed: onPressed,
       label: 'AI 추천',
       icon: Icons.auto_awesome,
-      gradientColors: const [Color(0xFF4285F4), Color(0xFF7B61FF)],
-      shadowColor: const Color(0xFF4285F4),
+      gradientColors: const [Color(0xFF4F8CFF), Color(0xFF6FA3FF)],
+      shadowColor: const Color(0xFF4F8CFF),
     );
   }
 }
@@ -438,8 +478,8 @@ class _BuyButton extends StatelessWidget {
       },
       label: '동행복권 바로구매',
       icon: Icons.shopping_cart,
-      gradientColors: const [Color(0xFF2ECC71), Color(0xFF27AE60)],
-      shadowColor: const Color(0xFF2ECC71),
+      gradientColors: const [Color(0xFF38B2AC), Color(0xFF4FD1C5)],
+      shadowColor: const Color(0xFF38B2AC),
     );
   }
 }
