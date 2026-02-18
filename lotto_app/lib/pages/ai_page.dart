@@ -27,7 +27,7 @@ class _AiPageState extends State<AiPage> with SingleTickerProviderStateMixin {
 
   Future<void> _loadData() async {
     try {
-      await _dataService.loadData(fetchCount: 100);
+      await _dataService.loadData(fetchCount: 1000);
       final analyzer = LottoAnalyzer(_dataService.draws);
       setState(() {
         _analysis = analyzer.analyze();
@@ -215,7 +215,7 @@ class _AiPageState extends State<AiPage> with SingleTickerProviderStateMixin {
           _sectionTitle('AI 추천 번호 (5세트)'),
           const SizedBox(height: 4),
           Text(
-            '과거 ${_dataService.draws.length}회 데이터 기반 분석',
+            '과거 ${_dataService.draws.length}회 (최대 1,000회) 데이터 기반 분석',
             style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 13),
           ),
           const SizedBox(height: 16),
@@ -245,6 +245,7 @@ class _AiPageState extends State<AiPage> with SingleTickerProviderStateMixin {
               ),
             ),
           ),
+          const SizedBox(height: 60),
         ],
       ),
     );
